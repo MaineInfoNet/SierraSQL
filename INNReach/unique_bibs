@@ -1,0 +1,30 @@
+WITH bib_item_counts AS (
+    SELECT
+        bir.bib_record_id,
+        MIN(i.location_code) AS location_code, -- only 1 item, so safe
+        COUNT(i.record_id) AS item_count
+    FROM sierra_view.bib_record_item_record_link bir
+    JOIN sierra_view.item_record i 
+        ON bir.item_record_id = i.record_id
+    GROUP BY bir.bib_record_id
+    HAVING COUNT(i.record_id) = 1
+)
+
+SELECT *
+FROM (
+    SELECT
+        COALESCE(location_code, 'BLANK') AS location_code,
+        COUNT(*) AS bib_count
+    FROM bib_item_counts
+    GROUP BY location_code
+
+    UNION ALL
+
+    SELECT
+        'TOTAL' AS location_code,
+        COUNT(*) AS bib_count
+    FROM bib_item_counts
+) t
+ORDER BY
+  CASE WHEN location_code = 'TOTAL' THEN 1 ELSE 0 END,
+  location_code;
