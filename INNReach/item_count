@@ -1,0 +1,20 @@
+SELECT *
+FROM (
+    SELECT
+      COALESCE(i.location_code, 'BLANK') AS location_code,
+      COUNT(DISTINCT i.id) AS item_count
+    FROM sierra_view.item_record i
+    JOIN sierra_view.record_metadata rmi ON i.id = rmi.id
+    GROUP BY i.location_code
+
+    UNION ALL
+
+    SELECT
+      'TOTAL' AS location_code,
+      COUNT(DISTINCT i.id) AS item_count
+    FROM sierra_view.item_record i
+    JOIN sierra_view.record_metadata rmi ON i.id = rmi.id
+) t
+ORDER BY
+  CASE WHEN location_code = 'TOTAL' THEN 1 ELSE 0 END,
+  location_code
