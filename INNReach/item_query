@@ -1,0 +1,27 @@
+SELECT
+  rmi.record_type_code||rmi.record_num AS "ItemNum",
+  ip.barcode,
+  rmb.record_type_code||rmb.record_num AS "BibNum",
+  i.itype_code_num,
+  mp.name AS "MaterialType",
+  SUBSTRING(i.location_code,1,3) AS "BranchId",
+  loc.name AS location_name,
+  i.checkout_total,
+  i.renewal_total,
+  rmi.creation_date_gmt AS "created",
+  rmi.agency_code_num,
+  rmi.record_last_updated_gmt,
+  i.checkin_statistics_group_code_num,
+  i.virtual_type_code,
+  i.virtual_item_central_code_num,
+  i.is_suppressed,
+  i.is_available_at_library,
+  i.last_status_update
+FROM sierra_view.item_record i
+JOIN sierra_view.record_metadata rmi ON i.id = rmi.id
+JOIN sierra_view.item_record_property ip ON i.id = ip.item_record_id
+JOIN sierra_view.bib_record_item_record_link l ON i.id = l.item_record_id
+JOIN sierra_view.record_metadata rmb ON l.bib_record_id = rmb.id
+JOIN sierra_view.bib_record_property bp ON l.bib_record_id = bp.bib_record_id
+JOIN sierra_view.material_property_myuser mp ON bp.material_code = mp.code
+JOIN sierra_view.location_myuser loc ON i.location_code = loc.code
