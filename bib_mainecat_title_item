@@ -1,0 +1,30 @@
+SELECT DISTINCT ON (ir.id)
+    brp.best_title,
+    brp.best_author,
+    ir.*,
+    irp.*,
+    iv.*
+FROM
+    sierra_view.bib_record_property AS brp
+
+INNER JOIN
+    sierra_view.bib_record_item_record_link AS link
+        ON link.bib_record_id = brp.bib_record_id
+
+INNER JOIN
+    sierra_view.item_record AS ir
+        ON ir.id = link.item_record_id
+
+LEFT JOIN
+    sierra_view.item_record_property AS irp
+        ON irp.item_record_id = ir.id
+
+LEFT JOIN
+    sierra_view.item_view AS iv
+        ON iv.id = ir.id
+
+WHERE
+    brp.best_title ILIKE '%insert title%'
+
+ORDER BY
+    ir.id;
